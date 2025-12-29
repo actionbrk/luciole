@@ -1,4 +1,4 @@
-# Firefly Watch Face
+# luciole
 
 A minimalist watch face for Android Wear OS.
 
