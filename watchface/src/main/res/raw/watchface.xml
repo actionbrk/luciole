@@ -16,20 +16,36 @@
     </UserConfigurations>
 
     <Scene>
-        <PartText x="225" y="225" width="225" height="225">
-            <Variant mode="AMBIENT" target="alpha" value="128" />
-            <TextCircular centerX="0" centerY="0" width="415" height="415"
-                startAngle="180" endAngle="90" direction="COUNTER_CLOCKWISE">
-                <Font family="susemono" size="28" color="[CONFIGURATION.themeColor]">
-                    <Template>
-                        <![CDATA[%s %d %s]]>
-                        <Parameter expression="[DAY_OF_WEEK_S]" />
-                        <Parameter expression="[DAY]" />
-                        <Parameter expression="[MONTH_S]" />
-                    </Template>
-                </Font>
-            </TextCircular>
-        </PartText>
+        <ComplicationSlot
+            x="0" y="0" width="450" height="450"
+            slotId="1"
+            supportedTypes="SHORT_TEXT,LONG_TEXT,RANGED_VALUE,MONOCHROMATIC_IMAGE,SMALL_IMAGE">
+            <DefaultProvider
+                policy="SYSTEM_PROVIDER"
+                value="DAY_OF_WEEK_AND_DATE" />
+            <Complication type="LONG_TEXT">
+                <PartText>
+                    <Variant mode="AMBIENT" target="alpha" value="128" />
+                    <TextCircular
+                        centerX="225" centerY="225"
+                        width="415" height="415"
+                        startAngle="330" endAngle="30">
+                        <Font family="susemono" size="28" color="[CONFIGURATION.themeColor]" />
+                    </TextCircular>
+                </PartText>
+            </Complication>
+            <Complication type="SHORT_TEXT">
+                <PartText>
+                    <Variant mode="AMBIENT" target="alpha" value="128" />
+                    <TextCircular
+                        centerX="225" centerY="225"
+                        width="415" height="415"
+                        startAngle="330" endAngle="30">
+                        <Font family="susemono" size="28" color="[CONFIGURATION.themeColor]" />
+                    </TextCircular>
+                </PartText>
+            </Complication>
+        </ComplicationSlot>
 
         <DigitalClock height="450" width="450" x="0" y="0">
             <TimeText format="hh" height="150" width="150" x="50" y="150">
