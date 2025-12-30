@@ -1,5 +1,21 @@
-# luciole
+# luciole ✨ — An essential Wear OS watch face
 
-A minimalist watch face for Android Wear OS.
+**luciole** is a minimalist watch face for Wear OS, crafted for clarity, endurance, and quiet awareness.
 
-The firefly in the center indicates a new notification.
+> A yellow dot appears. Something is waiting — **luciole** 🟡.
+
+## Why **luciole**?
+
+**luciole** aims to show what matters most — the time — and gently remind you when something needs attention. It is intentionally subtle: easy to notice, hard to annoy.
+
+- Clean, glanceable time display 👀
+- Designed to stay lightweight and power-friendly 🔋
+- Easy-to-spot notifications 🟡
+
+## Installation
+
+### Build from source
+
+1. Clone this repository
+2. Open it in Android Studio
+3. Build & Run on a Wear OS device/emulator
