@@ -1,8 +1,11 @@
 <resources>
     <string name="watch_face_name">Luciole</string>
     <string name="use_gyro">Enable Gyro</string>
-    <string name="color_theme_0">Classic</string>
+    <string name="color_theme_0">Luciole</string>
     <string name="color_theme_1">Bahia</string>
     <string name="color_theme_2">Abeille</string>
     <string name="color_theme_3">Banner</string>
+    <string name="date_position">Date position</string>
+    <string name="date_position_bottom_right">Bottom right</string>
+    <string name="date_position_top">Top</string>
 </resources>

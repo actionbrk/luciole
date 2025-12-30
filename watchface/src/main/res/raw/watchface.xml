@@ -8,28 +8,68 @@
             defaultValue="FALSE" />
         <ColorConfiguration id="themeColor" defaultValue="0"
             displayName="color_selector_display_name">
-            <ColorOption id="0" displayName="color_theme_0" colors="#EEFAFD47"/>
-            <ColorOption id="1" displayName="color_theme_1" colors="#a9c01c"/>
-            <ColorOption id="2" displayName="color_theme_2" colors="#bec125"/>
-            <ColorOption id="3" displayName="color_theme_3" colors="#ffff7a"/>
+            <ColorOption id="0" displayName="color_theme_0" colors="#EEFAFD47 #B4B4B4"/>
+            <ColorOption id="1" displayName="color_theme_1" colors="#a9c01c #B4B4B4"/>
+            <ColorOption id="2" displayName="color_theme_2" colors="#bec125 #B4B4B4"/>
+            <ColorOption id="3" displayName="color_theme_3" colors="#ffff7a #B4B4B4"/>
         </ColorConfiguration>
+        <ListConfiguration
+            id="date_position"
+            displayName="date_position"
+            defaultValue="0"
+            icon="calendar">
+            <ListOption id="0" displayName="date_position_bottom_right" icon="bottom_right"/>
+            <ListOption id="1" displayName="date_position_top" icon="up"/>
+        </ListConfiguration>
     </UserConfigurations>
 
     <Scene>
-        <PartText x="225" y="225" width="225" height="225">
-            <Variant mode="AMBIENT" target="alpha" value="128" />
-            <TextCircular centerX="0" centerY="0" width="415" height="415"
-                startAngle="180" endAngle="90" direction="COUNTER_CLOCKWISE">
-                <Font family="susemono" size="28" color="[CONFIGURATION.themeColor]">
-                    <Template>
-                        <![CDATA[%s %d %s]]>
-                        <Parameter expression="[DAY_OF_WEEK_S]" />
-                        <Parameter expression="[DAY]" />
-                        <Parameter expression="[MONTH_S]" />
-                    </Template>
-                </Font>
-            </TextCircular>
-        </PartText>
+        <ListConfiguration id="date_position">
+            <ListOption id="0">
+                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Transform
+                        target="tintColor"
+                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.1]"></Transform>
+                    <TextCircular
+                        centerX="225" centerY="225"
+                        width="415" height="415"
+                        startAngle="180" endAngle="90"
+                        direction="COUNTER_CLOCKWISE">
+                        <Font family="susemono" size="28" weight="SEMI_BOLD">
+                            <Template>
+                                <![CDATA[%s %s/%s]]>
+                                <Parameter expression="[DAY_OF_WEEK_S]" />
+                                <Parameter expression="[DAY]" />
+                                <Parameter expression="[MONTH]" />
+                            </Template>
+                        </Font>
+                    </TextCircular>
+                </PartText>
+            </ListOption>
+            <ListOption id="1">
+                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Transform
+                        target="tintColor"
+                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.1]"></Transform>
+                    <TextCircular
+                        centerX="225" centerY="225"
+                        width="415" height="415"
+                        startAngle="315" endAngle="45"
+                        direction="CLOCKWISE">
+                        <Font family="susemono" size="28" weight="SEMI_BOLD">
+                            <Template>
+                                <![CDATA[%s %s/%s]]>
+                                <Parameter expression="[DAY_OF_WEEK_S]" />
+                                <Parameter expression="[DAY]" />
+                                <Parameter expression="[MONTH]" />
+                            </Template>
+                        </Font>
+                    </TextCircular>
+                </PartText>
+            </ListOption>
+        </ListConfiguration>
 
         <DigitalClock height="450" width="450" x="0" y="0">
             <TimeText format="hh" height="150" width="150" x="50" y="150">
@@ -42,26 +82,26 @@
             </TimeText>
 
             <TimeText alpha="0" format="hh" height="150" width="150" x="50" y="150">
-                <Variant mode="AMBIENT" target="alpha" value="255" />
+                <Variant mode="AMBIENT" target="alpha" value="180" />
                 <Font color="#ffffffff" family="susemono" size="100" weight="ULTRA_LIGHT" />
             </TimeText>
             <TimeText alpha="0" format="mm" height="150" width="150" x="250" y="150">
-                <Variant mode="AMBIENT" target="alpha" value="255" />
+                <Variant mode="AMBIENT" target="alpha" value="180" />
                 <Font color="#ffffffff" family="susemono" size="100" weight="ULTRA_LIGHT" />
             </TimeText>
         </DigitalClock>
 
         <Condition>
             <Expressions>
-                <Expression name="show_gyro"><![CDATA[([UNREAD_NOTIFICATION_COUNT] > -1) && [CONFIGURATION.use_gyro] == "TRUE"]]></Expression>
-                <Expression name="show_static"><![CDATA[([UNREAD_NOTIFICATION_COUNT] > -1) && [CONFIGURATION.use_gyro] == "FALSE"]]></Expression>
+                <Expression name="show_gyro"><![CDATA[([UNREAD_NOTIFICATION_COUNT] > 0) && [CONFIGURATION.use_gyro] == "TRUE"]]></Expression>
+                <Expression name="show_static"><![CDATA[([UNREAD_NOTIFICATION_COUNT] > 0) && [CONFIGURATION.use_gyro] == "FALSE"]]></Expression>
             </Expressions>
 
             <Compare expression="show_static">
                 <PartDraw height="16" width="16" x="217" y="217">
                     <Variant mode="AMBIENT" target="alpha" value="180" />
                     <Ellipse height="16" width="16" x="0" y="0">
-                        <Fill color="[CONFIGURATION.themeColor]" />
+                        <Fill color="[CONFIGURATION.themeColor.0]" />
                     </Ellipse>
                 </PartDraw>
             </Compare>
@@ -73,7 +113,7 @@
                         scaleX="1.0 + ([ACCELEROMETER_ANGLE_Z] * 0.005)"
                         scaleY="1.0 + ([ACCELEROMETER_ANGLE_Z] * 0.005)" />
                     <Ellipse height="16" width="16" x="0" y="0">
-                        <Fill color="[CONFIGURATION.themeColor]" />
+                        <Fill color="[CONFIGURATION.themeColor.0]" />
                     </Ellipse>
                 </PartDraw>
             </Compare>
