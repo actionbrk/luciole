@@ -25,6 +25,7 @@
 
     <Scene>
         <ListConfiguration id="date_position">
+            <!-- DATE: bottom-right -->
             <ListOption id="0">
                 <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
@@ -36,10 +37,10 @@
                         width="415" height="415"
                         startAngle="180" endAngle="90"
                         direction="COUNTER_CLOCKWISE">
-                        <Font family="susemono" size="28" weight="SEMI_BOLD">
+                        <Font family="suse" size="28" weight="SEMI_BOLD" letterSpacing="0.05">
                             <Template>
                                 <![CDATA[%s %s/%s]]>
-                                <Parameter expression="[DAY_OF_WEEK_S]" />
+                                <Parameter expression="subText([DAY_OF_WEEK_S], 0, 3)" />
                                 <Parameter expression="[DAY]" />
                                 <Parameter expression="[MONTH]" />
                             </Template>
@@ -47,6 +48,7 @@
                     </TextCircular>
                 </PartText>
             </ListOption>
+            <!-- DATE: top -->
             <ListOption id="1">
                 <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
@@ -58,10 +60,10 @@
                         width="415" height="415"
                         startAngle="315" endAngle="45"
                         direction="CLOCKWISE">
-                        <Font family="susemono" size="28" weight="SEMI_BOLD">
+                        <Font family="susemono" size="28" weight="SEMI_BOLD" letterSpacing="0.05">
                             <Template>
                                 <![CDATA[%s %s/%s]]>
-                                <Parameter expression="[DAY_OF_WEEK_S]" />
+                                <Parameter expression="subText([DAY_OF_WEEK_S], 0, 3)" />
                                 <Parameter expression="[DAY]" />
                                 <Parameter expression="[MONTH]" />
                             </Template>
@@ -117,8 +119,6 @@
                     </Ellipse>
                 </PartDraw>
             </Compare>
-
         </Condition>
-
     </Scene>
 </WatchFace>
