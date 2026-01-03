@@ -9,7 +9,7 @@
 **luciole** aims to show what matters most — the time — and gently remind you when something needs attention. It is intentionally subtle: easy to notice, hard to annoy.
 
 - Clean, glanceable time display 👀
-- Designed to stay lightweight and power-friendly 🔋
+- Lightweight and power-friendly 🔋
 - Easy-to-spot notifications 🟡
 
 ## Installation
@@ -19,3 +19,7 @@
 1. Clone this repository
 2. Open it in Android Studio
 3. Build & Run on a Wear OS device/emulator
+
+### Change watch settings
+
+It is recommended to disable this setting on your watch: **Settings > General > Show unread notification dot**.

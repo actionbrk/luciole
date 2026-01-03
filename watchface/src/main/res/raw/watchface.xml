@@ -8,10 +8,10 @@
             defaultValue="FALSE" />
         <ColorConfiguration id="themeColor" defaultValue="0"
             displayName="color_selector_display_name">
-            <ColorOption id="0" displayName="color_theme_0" colors="#EEFAFD47 #B4B4B4"/>
-            <ColorOption id="1" displayName="color_theme_1" colors="#a9c01c #B4B4B4"/>
-            <ColorOption id="2" displayName="color_theme_2" colors="#bec125 #B4B4B4"/>
-            <ColorOption id="3" displayName="color_theme_3" colors="#ffff7a #B4B4B4"/>
+            <ColorOption id="0" displayName="color_theme_0" colors="#EEFAFD47 #ffffffff #B4B4B4"/>
+            <ColorOption id="1" displayName="color_theme_1" colors="#a9c01c #ffffffff #B4B4B4"/>
+            <ColorOption id="2" displayName="color_theme_2" colors="#bec125 #ffffffff #B4B4B4"/>
+            <ColorOption id="3" displayName="color_theme_3" colors="#ffff7a #ffffffff #B4B4B4"/>
         </ColorConfiguration>
         <ListConfiguration
             id="date_position"
@@ -24,14 +24,60 @@
     </UserConfigurations>
 
     <Scene>
-        <ListConfiguration id="date_position">
-            <!-- DATE: bottom-right -->
-            <ListOption id="0">
-                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
+        <ComplicationSlot
+            slotId="0"
+            x="0" y="0"
+            width="450" height="450"
+            supportedTypes="SHORT_TEXT EMPTY"
+            isCustomizable="TRUE">
+            <BoundingArc
+                centerX="225" centerY="225"
+                width="450" height="450"
+                startAngle="290" endAngle="340"
+                thickness="40"
+                direction="CLOCKWISE"
+                outlinePadding="0"
+                isRoundEdge="TRUE"/>
+            <DefaultProviderPolicy
+                defaultSystemProvider="EMPTY"
+                defaultSystemProviderType="EMPTY" />
+
+            <Complication type="SHORT_TEXT">
+                <PartText x="0" y="0" width="400" height="400" tintColor="[CONFIGURATION.themeColor.2]">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <TextCircular
+                        centerX="225" centerY="225"
+                        width="415" height="415"
+                        startAngle="320" endAngle="350"
+                        align="START"
+                        direction="CLOCKWISE"
+                        ellipsis="TRUE">
+                        <Font family="susemono" size="28" weight="SEMI_BOLD">
+                            <Template><![CDATA[%s]]><Parameter expression="[COMPLICATION.TEXT]" /></Template>
+                        </Font>
+                    </TextCircular>
+                </PartText>
+                <!-- Because <InlineImage> does not work with [COMPLICATION.MONOCHROMATIC_IMAGE]-->
+                <PartImage x="70" y="63" width="24" height="24" angle="319" tintColor="[CONFIGURATION.themeColor.2]">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Transform
                         target="tintColor"
-                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.1]"></Transform>
+                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.2]" />
+<!--                    <Image resource="heart"/>-->
+                    <Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" />
+                </PartImage>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- ... (Reste de la Scene : Date, DigitalClock, etc.) ... -->
+        <ListConfiguration id="date_position">
+            <!-- DATE: bottom-right -->
+            <ListOption id="0">
+                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.2]">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Transform
+                        target="tintColor"
+                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.2]" />
                     <TextCircular
                         centerX="225" centerY="225"
                         width="415" height="415"
@@ -50,11 +96,11 @@
             </ListOption>
             <!-- DATE: top -->
             <ListOption id="1">
-                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.0]">
+                <PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.2]">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Transform
                         target="tintColor"
-                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.1]"></Transform>
+                        value="[UNREAD_NOTIFICATION_COUNT] > 0 ? [CONFIGURATION.themeColor.0] : [CONFIGURATION.themeColor.2]" />
                     <TextCircular
                         centerX="225" centerY="225"
                         width="415" height="415"
@@ -76,20 +122,20 @@
         <DigitalClock height="450" width="450" x="0" y="0">
             <TimeText format="hh" height="150" width="150" x="50" y="150">
                 <Variant mode="AMBIENT" target="alpha" value="0" />
-                <Font color="#ffffffff" family="susemono" size="100" />
+                <Font color="[CONFIGURATION.themeColor.1]" family="susemono" size="100" />
             </TimeText>
             <TimeText format="mm" height="150" width="150" x="250" y="150">
                 <Variant mode="AMBIENT" target="alpha" value="0" />
-                <Font color="#ffffffff" family="susemono" size="100" />
+                <Font color="[CONFIGURATION.themeColor.1]" family="susemono" size="100" />
             </TimeText>
 
             <TimeText alpha="0" format="hh" height="150" width="150" x="50" y="150">
                 <Variant mode="AMBIENT" target="alpha" value="180" />
-                <Font color="#ffffffff" family="susemono" size="100" weight="ULTRA_LIGHT" />
+                <Font color="[CONFIGURATION.themeColor.1]" family="susemono" size="100" weight="ULTRA_LIGHT" />
             </TimeText>
             <TimeText alpha="0" format="mm" height="150" width="150" x="250" y="150">
                 <Variant mode="AMBIENT" target="alpha" value="180" />
-                <Font color="#ffffffff" family="susemono" size="100" weight="ULTRA_LIGHT" />
+                <Font color="[CONFIGURATION.themeColor.1]" family="susemono" size="100" weight="ULTRA_LIGHT" />
             </TimeText>
         </DigitalClock>
 
