@@ -49,9 +49,10 @@ jobs:
             version="${GITHUB_SHA::7}"
           fi
           mkdir -p dist
-          cp watchface/build/outputs/apk/release/*.apk "dist/luciole-$version.apk"
+          # An unsigned build would be named watchface-release-unsigned.apk and make this step fail.
+          cp watchface/build/outputs/apk/release/watchface-release.apk "dist/luciole-$version.apk"
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: luciole-apk
           path: dist/*.apk
@@ -64,7 +65,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: luciole-apk
           path: dist
