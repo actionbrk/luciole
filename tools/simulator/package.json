@@ -1,0 +1,11 @@
+{
+  "name": "luciole-simulator",
+  "private": true,
+  "description": "Approximate browser renderer and screenshot tool for the luciole watch face",
+  "scripts": {
+    "shoot": "node shoot.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

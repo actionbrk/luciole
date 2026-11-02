@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Luciole Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* Fonts shipped with the watch face (variable fonts with a wght axis) */
+  @font-face { font-family: "suse";     src: url("../../watchface/src/main/res/font/suse.ttf");     font-weight: 100 900; }
+  @font-face { font-family: "susemono"; src: url("../../watchface/src/main/res/font/susemono.ttf"); font-weight: 100 800; }
+  html, body { margin: 0; background: transparent; }
+  #face { display: block; }
+</style>
+</head>
+<body>
+<svg id="face" xmlns="http://www.w3.org/2000/svg" width="450" height="450" viewBox="0 0 450 450"></svg>
+<script>
+/*
+ * Approximate renderer for watchface/src/main/res/raw/watchface.xml.
+ *
+ * The scene is mirrored BY HAND: when you change watchface.xml (positions,
+ * colors, fonts...), update the matching block below.
+ *
+ * Usage:
+ *   - Open through a local HTTP server (fonts do not load over file://), e.g.
+ *       python3 -m http.server   (from the repository root)
+ *       http://localhost:8000/tools/simulator/simulator.html?unread=1
+ *   - Query parameters: theme=0..3, unread=N, ambient=1, date=top|bottom,
+ *       time=HH:MM, day=YYYY-MM-DD, locale=fr|en|..., comp=<text>, icon=heart|steps
+ *   - Or call window.render(state) from a script (see shoot.js).
+ */
+const W = 450, CX = 225, CY = 225;
+const THEMES = {             // <ColorOption colors="..."> (#AARRGGBB or #RRGGBB)
+  0: ["#EEFAFD47", "#ffffffff", "#B4B4B4"], // Luciole
+  1: ["#a9c01c",   "#ffffffff", "#B4B4B4"], // Bahia
+  2: ["#bec125",   "#ffffffff", "#B4B4B4"], // Abeille
+  3: ["#ffff7a",   "#ffffffff", "#B4B4B4"], // Banner
+};
+// WFF <Font weight="..."> keywords -> numeric weights
+const WEIGHT = { NORMAL: 400, ULTRA_LIGHT: 200, SEMI_BOLD: 600 };
+// WFF colors are #AARRGGBB when they have 8 hex digits
+function wffColor(hex) {
+  const h = hex.replace("#", "");
+  if (h.length === 8) {
+    const a = parseInt(h.slice(0, 2), 16) / 255;
+    return `rgba(${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${parseInt(h.slice(6, 8), 16)},${a.toFixed(3)})`;
+  }
+  return "#" + h;
+}
+const NS = "http://www.w3.org/2000/svg";
+function el(name, attrs = {}, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+// WFF angles: 0deg = 12 o'clock, increasing clockwise
+function pt(r, deg) {
+  const t = deg * Math.PI / 180;
+  return [CX + r * Math.sin(t), CY - r * Math.cos(t)];
+}
+let pathId = 0;
+// <TextCircular>: the radial placement is not documented; the text is centred
+// on the ellipse (radius = width / 2), which matches where the complication
+// icon was placed. SUSE / SUSE Mono metrics: ascent 980, descent 280 (upm
+// 1000), so the centre of the line box sits 0.35em above the baseline.
+function textCircular(g, { r, startAngle, endAngle, direction, align = "CENTER", ellipsis = false,
+                           family, size, weight, letterSpacing = 0, fill, text }) {
+  const cw = direction !== "COUNTER_CLOCKWISE";
+  const span = cw ? ((endAngle - startAngle) % 360 + 360) % 360 : ((startAngle - endAngle) % 360 + 360) % 360;
+  const rb = cw ? r - 0.35 * size : r + 0.35 * size;   // baseline radius
+  const [x0, y0] = pt(rb, startAngle), [x1, y1] = pt(rb, endAngle);
+  const id = "arc" + (pathId++);
+  el("path", { id, d: `M ${x0} ${y0} A ${rb} ${rb} 0 ${span > 180 ? 1 : 0} ${cw ? 1 : 0} ${x1} ${y1}`, fill: "none" },
+     g.ownerSVGElement.querySelector("defs"));
+  const t = el("text", {
+    "font-family": family, "font-size": size, "font-weight": weight, fill,
+    "letter-spacing": `${letterSpacing}em`,
+  }, g);
+  const tp = el("textPath", { href: "#" + id }, t);
+  if (align === "CENTER") { tp.setAttribute("startOffset", "50%"); t.setAttribute("text-anchor", "middle"); }
+  else if (align === "END") { tp.setAttribute("startOffset", "100%"); t.setAttribute("text-anchor", "end"); }
+  tp.textContent = text;
+  if (ellipsis) {
+    const maxLen = rb * span * Math.PI / 180;
+    let s = text;
+    while (s.length > 1 && t.getComputedTextLength() > maxLen) { s = s.slice(0, -1); tp.textContent = s.trimEnd() + "…"; }
+  }
+  return t;
+}
+// <TimeText>: text centred horizontally and vertically in its box (font line box)
+function timeText(g, { x, y, w, h, text, size, weight, fill, opacity }) {
+  const baseline = y + h / 2 + 0.35 * size;
+  el("text", { x: x + w / 2, y: baseline, "text-anchor": "middle", "font-family": "susemono",
+               "font-size": size, "font-weight": weight, fill, opacity }, g).textContent = text;
+}
+// Monochromatic complication icons (Material icons, 24x24)
+const ICONS = {
+  heart: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+  steps: "M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9 7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7",
+};
+
+/**
+ * state = {
+ *   theme: 0..3, unread: number, ambient: bool, datePos: 0 (bottom right) | 1 (top),
+ *   hh: "10", mm: "10", dow: "lun." ([DAY_OF_WEEK_S]), day: 2, month: 11,
+ *   complication: null | { text: "72", icon: "heart" | "steps" }
+ * }
+ */
+function render(state) {
+  const svg = document.getElementById("face");
+  svg.innerHTML = "";
+  pathId = 0;
+  el("defs", {}, svg);
+  const clip = el("clipPath", { id: "screen" }, svg.querySelector("defs"));
+  el("circle", { cx: CX, cy: CY, r: W / 2 }, clip);
+  const g = el("g", { "clip-path": "url(#screen)" }, svg);
+  el("rect", { x: 0, y: 0, width: W, height: W, fill: "#000" }, g);
+
+  const [c0, c1, c2] = THEMES[state.theme].map(wffColor);
+  const notif = state.unread > 0;
+  const amb = state.ambient;
+
+  // --- <ComplicationSlot slotId="0"> SHORT_TEXT, hidden in AMBIENT
+  if (!amb && state.complication) {
+    textCircular(g, { r: 415 / 2, startAngle: 320, endAngle: 350, direction: "CLOCKWISE", align: "START",
+      ellipsis: true, family: "susemono", size: 28, weight: WEIGHT.SEMI_BOLD, fill: c2, text: state.complication.text });
+    // <PartImage x="70" y="63" width="24" height="24" angle="319">, tinted when there are unread notifications
+    const ig = el("g", { transform: `rotate(319 ${70 + 12} ${63 + 12}) translate(70 63)` }, g);
+    el("path", { d: ICONS[state.complication.icon] || ICONS.heart, fill: notif ? c0 : c2 }, ig);
+  }
+
+  // --- <ListConfiguration id="date_position">, hidden in AMBIENT
+  if (!amb) {
+    const text = `${state.dow.slice(0, 3)} ${state.day}/${state.month}`;
+    const fill = notif ? c0 : c2;
+    if (state.datePos === 0)
+      textCircular(g, { r: 415 / 2, startAngle: 180, endAngle: 90, direction: "COUNTER_CLOCKWISE",
+        family: "suse", size: 28, weight: WEIGHT.SEMI_BOLD, letterSpacing: 0.05, fill, text });
+    else
+      textCircular(g, { r: 415 / 2, startAngle: 315, endAngle: 45, direction: "CLOCKWISE",
+        family: "susemono", size: 28, weight: WEIGHT.SEMI_BOLD, letterSpacing: 0.05, fill, text });
+  }
+
+  // --- <DigitalClock>
+  const timeStyle = amb
+    ? { size: 100, weight: WEIGHT.ULTRA_LIGHT, fill: c1, opacity: 180 / 255 }
+    : { size: 100, weight: WEIGHT.NORMAL, fill: c1, opacity: 1 };
+  timeText(g, { x: 50,  y: 150, w: 150, h: 150, text: state.hh, ...timeStyle });
+  timeText(g, { x: 250, y: 150, w: 150, h: 150, text: state.mm, ...timeStyle });
+
+  // --- Notification dot (<Compare expression="show_static">), alpha 180 in AMBIENT
+  if (notif)
+    el("circle", { cx: 217 + 8, cy: 217 + 8, r: 8, fill: c0, opacity: amb ? 180 / 255 : 1 }, g);
+}
+
+// Build a state from URL query parameters (defaults: now, browser locale)
+function stateFromQuery(search) {
+  const q = new URLSearchParams(search);
+  const now = new Date();
+  const day = q.get("day") ? new Date(q.get("day") + "T12:00:00") : now;
+  const [hh, mm] = (q.get("time") || `${now.getHours()}:${now.getMinutes()}`).split(":").map(v => v.padStart(2, "0"));
+  const locale = q.get("locale") || navigator.language;
+  return {
+    theme: Number(q.get("theme") || 0),
+    unread: Number(q.get("unread") || 0),
+    ambient: q.get("ambient") === "1",
+    datePos: q.get("date") === "top" ? 1 : 0,
+    hh, mm,
+    dow: new Intl.DateTimeFormat(locale, { weekday: "short" }).format(day),
+    day: day.getDate(),
+    month: day.getMonth() + 1,
+    complication: q.get("comp") ? { text: q.get("comp"), icon: q.get("icon") || "heart" } : null,
+  };
+}
+
+// Load the fonts before the first render (text measurement for the ellipsis depends on them)
+window.fontsLoaded = Promise.all(
+  ["100 28px suse", "600 28px suse", "200 100px susemono", "400 100px susemono", "600 28px susemono"]
+    .map(f => document.fonts.load(f)));
+window.render = render;
+window.stateFromQuery = stateFromQuery;
+window.fontsLoaded.then(() => render(stateFromQuery(location.search)));
+</script>
+</body>
+</html>

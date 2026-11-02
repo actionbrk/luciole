@@ -23,3 +23,7 @@
 ### Change watch settings
 
 It is recommended to disable this setting on your watch: **Settings > General > Show unread notification dot**.
+
+## Preview without a watch
+
+[`tools/simulator`](tools/simulator) renders an approximation of the watch face in a browser and can take screenshots of each state (active, unread notification, ambient, date position, color themes).
