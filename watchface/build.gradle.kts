@@ -19,8 +19,22 @@ android {
 
     }
 
+    // Release signing key, provided through environment variables (see .github/workflows/build.yml).
+    // Without it, release builds are signed with the debug key so the APK is still installable.
+    signingConfigs {
+        System.getenv("LUCIOLE_KEYSTORE_PATH")?.let { keystore ->
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = System.getenv("LUCIOLE_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("LUCIOLE_KEY_ALIAS")
+                keyPassword = System.getenv("LUCIOLE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
