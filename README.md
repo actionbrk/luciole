@@ -16,22 +16,19 @@
 
 **luciole** requires a watch running **Wear OS 6** or later.
 
-### Install the APK (sideloading)
+### Install with Wear Installer 2
 
-1. Download the latest `luciole-*.apk` from the [Releases page](https://github.com/actionbrk/luciole/releases).
-2. On the watch, enable the developer options: **Settings > System > About > Versions**, then tap **Build number** 7 times (on Galaxy Watch: **Settings > About watch > Software information > Software version**).
-3. In **Settings > Developer options**, enable **ADB debugging** and **Wireless debugging**. The watch and the computer must be on the same Wi-Fi network.
-4. In **Wireless debugging**, tap **Pair new device** and pair from your computer with [adb](https://developer.android.com/tools/releases/platform-tools):
-   ```sh
-   adb pair <ip>:<pairing port>   # enter the pairing code shown on the watch
-   adb connect <ip>:<port>        # ip and port shown on the Wireless debugging screen
-   adb install luciole-*.apk
-   ```
-5. Long-press the current watch face, scroll to the end, tap **+** and choose **luciole**.
+**luciole** is installed from your Android phone with the **Wear Installer 2** app ([help page](https://freepoc.org/wear-installer-2-help-page/)). Nothing needs to be installed on the watch beforehand.
 
-No computer? Android phone apps such as *Wear Installer 2* or *Bugjaeger* can install an APK on the watch over Wireless debugging, using the same pairing steps.
+1. On your phone, install **Wear Installer 2** from the Play Store, then download the latest `luciole-*.apk` from the [Releases page](https://github.com/actionbrk/luciole/releases) (it is saved in the **Download** folder).
+2. On the watch, enable the developer options: **Settings > System > About > Versions**, then tap **Build number** 7 times (on Galaxy Watch: **Settings > About watch > Software information**, then tap **Software version** 7 times).
+3. In **Settings > Developer options**, enable **ADB debugging** and **Wireless debugging**. The watch and the phone must be on the same Wi-Fi network (a phone hotspot does not work).
+4. On the watch, open **Wireless debugging > Pair new device**: it shows a pairing code, an IP address and a port. Enter them in Wear Installer 2 to pair the phone with the watch.
+5. In Wear Installer 2, connect to the watch with the IP address and port shown on the **Wireless debugging** screen. This port is different from the pairing port.
+6. Tap **Custom APK**, select the `luciole-*.apk` file, then tap **Install**.
+7. On the watch, long-press the current watch face, scroll to the end, tap **+** and choose **luciole**. If it is not in the list (on some Galaxy Watch models), select it with **Set Watchface** in Wear Installer 2.
 
-Once installed, you can turn **ADB debugging** and **Wireless debugging** off again.
+Once installed, turn **Wireless debugging** and **ADB debugging** off again.
 
 ### Build from source
 
